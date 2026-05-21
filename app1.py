@@ -30,6 +30,45 @@ if df is not None:
     
     st.title("Instagram User Behavior & Health Dashboard")
     st.markdown("Change the filters in the left sidebar to update the metrics for all charts simultaneously.")
+    with st.expander("ℹ️ About Instagram User Analysis (Click to expand/collapse)", expanded=True):
+        st.markdown("### Instagram User Analysis")
+        st.write(
+            "Instagram User Analysis is a web-based analytics platform designed to explore and visualize "
+            "social media user behavior through interactive dashboards and data-driven insights. The project "
+            "uses a large-scale synthetic dataset containing over 1 million users with demographic, lifestyle, "
+            "behavioral, and engagement attributes."
+        )
+        st.write(
+            "This website helps users better understand social media trends, audience behavior, and digital "
+            "interaction patterns through modern visualizations and analytical tools."
+        )
+        
+        # Chia làm 2 cột cho đẹp mắt
+        intro_col1, intro_col2 = st.columns(2)
+        with intro_col1:
+            st.markdown("#### ✨ Key Features")
+            st.markdown(
+                """
+                - Interactive dashboards and charts
+                - User demographic analysis
+                - Social media engagement insights
+                - Lifestyle and behavioral pattern exploration
+                - Data filtering and visualization tools
+                - Machine learning and statistical analysis support
+                """
+            )
+        with intro_col2:
+            st.markdown("#### 🎯 Purpose")
+            st.markdown(
+                """
+                The platform is built for:
+                - Data analysis practice
+                - Academic and research purposes
+                - Machine learning projects
+                - Data visualization learning
+                - Social media behavior exploration
+                """
+            )
     st.markdown("---")
 
     st.sidebar.header("GLOBAL FILTERS")
