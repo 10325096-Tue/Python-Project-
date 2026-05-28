@@ -3,15 +3,28 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import requests
+import io
 
 st.set_page_config(page_title="Instagram User Analytics", layout="wide")
 
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("data.csv", encoding='latin1', sep=';') 
+        # Đường link tải trực tiếp (Direct Download) từ Google Drive của nhóm bạn
+        # Tui đã chuyển đổi cấu trúc link từ ảnh chụp của bạn sang định dạng xuất file trực tiếp
+        file_id = "1n_9kA8BPrZpuDxdZrGHGoXZ7KUi9cUVJ"
+        url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        
+        # Tải dữ liệu trực tiếp vào bộ nhớ RAM của Web Streamlit Cloud
+        response = requests.get(url)
+        response.raise_for_status()
+        
+        # Đọc dữ liệu CSV bằng pandas
+        df = pd.read_csv(io.BytesIO(response.content), encoding='latin1', sep=';')
         df.columns = [str(col).lower().strip() for col in df.columns]
         
+        # Tối ưu hóa kiểu dữ liệu để tăng tốc độ load cho web
         for col in df.columns:
             if df[col].dtype == 'float64':
                 df[col] = df[col].astype(np.float32)
@@ -20,7 +33,7 @@ def load_data():
                 
         return df
     except Exception as e:
-        st.error(f"Error loading data: {e}")
+        st.error(f"Error loading data from Google Drive: {e}")
         return None
 
 df = load_data()
