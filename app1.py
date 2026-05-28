@@ -3,8 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-import requests
-import io
 
 st.set_page_config(page_title="Instagram User Analytics", layout="wide")
 
