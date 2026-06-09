@@ -73,14 +73,12 @@ if df is not None:
     st.sidebar.header("GLOBAL FILTERS")
     st.sidebar.markdown("Select conditions to update the dashboard:")
     
-    # SỬA THEO FEEDBACK: Đổi sang multiselect cho Gender
     gender_options = list(df["gender"].dropna().unique())
     filter_gender = st.sidebar.multiselect("👤 1. User Gender:", options=gender_options, default=gender_options)
 
     children_list = ["All"] + list(df["has_children"].dropna().unique())
     filter_children = st.sidebar.selectbox("🏡 2. Parental Status:", children_list)
     
-    # SỬA THEO FEEDBACK: Đổi sang multiselect cho Diet Quality
     diet_options = list(df["diet_quality"].dropna().unique()) if "diet_quality" in df.columns else []
     filter_diet = st.sidebar.multiselect("🥗 3. Diet Quality:", options=diet_options, default=diet_options)
     
@@ -90,11 +88,10 @@ if df is not None:
     
     df_filtered = df.copy()
     
-    # Áp dụng bộ lọc mới (Xử lý mảng đa lựa chọn từ multiselect)
     if filter_gender:
         df_filtered = df_filtered[df_filtered["gender"].isin(filter_gender)]
     else:
-        df_filtered = df_filtered.iloc[0:0] # Nếu không chọn gender nào thì trả về rỗng
+        df_filtered = df_filtered.iloc[0:0]
         
     if filter_children != "All":
         df_filtered = df_filtered[df_filtered["has_children"] == filter_children]
@@ -115,7 +112,6 @@ if df is not None:
     if df_filtered.empty:
         st.warning("No users match the selected filters. Please adjust your criteria.")
     else:
-        # SỬA THEO FEEDBACK: Tách cấu trúc hiển thị thành 3 Tabs riêng biệt tránh cuộn sâu
         tab1, tab2, tab3 = st.tabs(["📊 Part 1: Demographics & Family", "🏥 Part 2: Health & Physical Status", "⛺ Part 3: Lifestyle & Habits"])
         
         with tab1:
@@ -127,16 +123,29 @@ if df is not None:
                 gender_counts = df_filtered["gender"].value_counts()
                 if not gender_counts.empty:
                     fig, ax = plt.subplots(figsize=(8, 5))
-                    # SỬA THEO FEEDBACK: Đưa label hiển thị trực tiếp bên cạnh miếng bánh (bỏ hộp legend phụ)
-                    ax.pie(
+                    
+                    # Tính toán tổng để tự tạo nhãn phần trăm chuẩn xác dưới Legend
+                    total_gender = gender_counts.sum()
+                    
+                    # SỬA TẠI ĐÂY: Loại bỏ autopct để vòng tròn không bị dính chữ lem nhem nữa
+                    wedges, texts = ax.pie(
                         gender_counts.values,
-                        labels=[f"{g}\n({n:,})" for g, n in zip(gender_counts.index, gender_counts.values)],
                         colors=plt.get_cmap("Pastel1").colors,
                         startangle=90,
-                        wedgeprops=dict(width=0.4, edgecolor="white"),
-                        autopct='%1.1f%%',
-                        pctdistance=0.75
+                        wedgeprops=dict(width=0.4, edgecolor="white")
                     )
+                        
+                    # SỬA TẠI ĐÂY: Tích hợp đầy đủ Số lượng + Phần trăm (%) xếp hàng ngay ngắn bên dưới
+                    ax.legend(
+                        wedges, 
+                        [f"{g}: {n:,} ({n/total_gender*100:.1f}%)" for g, n in zip(gender_counts.index, gender_counts.values)],
+                        title="Gender Groups",
+                        loc="upper center",
+                        bbox_to_anchor=(0.5, -0.05),
+                        ncol=2,
+                        frameon=False
+                    )
+                    ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
                 else:
@@ -147,15 +156,27 @@ if df is not None:
                 counts_child = df_filtered["has_children"].value_counts()
                 if not counts_child.empty:
                     fig, ax = plt.subplots(figsize=(8, 5))
-                    # SỬA THEO FEEDBACK: Đưa label hiển thị trực tiếp lên biểu đồ tròn thay vì dùng hộp legend riêng lẻ
-                    ax.pie(
+                    
+                    total_child = counts_child.sum()
+                    
+                    # SỬA TẠI ĐÂY: Áp dụng đồng bộ giải pháp làm sạch cho cả biểu đồ trạng thái con cái
+                    wedges, texts = ax.pie(
                         counts_child.values, 
-                        labels=[f"Has Child: {k}\n({v:,})" for k, v in zip(counts_child.index, counts_child.values)],
-                        autopct='%1.0f%%', 
                         colors=["#87C5FF", "#F8EBA3"], 
                         startangle=90,
-                        pctdistance=0.65
+                        wedgeprops=dict(width=0.4, edgecolor="white")
                     )
+                        
+                    ax.legend(
+                        wedges,
+                        [f"{k}: {v:,} ({v/total_child*100:.1f}%)" for k, v in zip(counts_child.index, counts_child.values)],
+                        title="Parental Status",
+                        loc="upper center",
+                        bbox_to_anchor=(0.5, -0.05),
+                        ncol=2,
+                        frameon=False
+                    )
+                    ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
                 else:
@@ -210,7 +231,6 @@ if df is not None:
                     ax.vlines(counts_diet.index, 0, counts_diet.values, colors=colors, linewidth=3)
                     ax.scatter(counts_diet.index, counts_diet.values, s=200, color=colors)
                     
-                    # Phần vẽ dữ liệu text động lên đầu các điểm nút đã được kiểm soát an toàn chống lỗi NameError
                     diet_vals = counts_diet.values
                     for i, val in enumerate(diet_vals):
                         ax.text(i, val + (max(diet_vals) * 0.03), f'{int(val):,}', 
@@ -290,7 +310,6 @@ st.markdown("""
             padding: 5px 10px;
             border-left: 5px solid #ffb3c1;
         }
-        /* Đồng bộ CSS cho cả Selectbox và Multiselect */
         [data-testid="stSidebar"] .stSelectbox, [data-testid="stSidebar"] .stMultiSelect {
             background-color: #ffffff !important;
             border: 2px solid #b3e5fc !important;
@@ -308,7 +327,6 @@ st.markdown("""
             background-color: #ff718a !important;
             border: 2px solid #ffffff !important;
         }
-        /* SỬA THEO FEEDBACK: Đã loại bỏ thuộc tính hover transform:scale() và box-shadow gây lỗi giật/nhảy của thanh trượt */
         [data-testid="stSidebar"] div[data-testid="stMetric"] {
             background-color: #e0f7fa !important;
             padding: 18px !important;
@@ -408,7 +426,6 @@ st.markdown("""
             border-radius: 16px !important;
             overflow: hidden !important;
         }
-        /* Custom phong cách thiết kế Pastel cho thanh điều hướng Tabs ngang */
         button[data-baseweb="tab"] {
             font-family: 'Quicksand', sans-serif !important;
             font-weight: bold !important;
