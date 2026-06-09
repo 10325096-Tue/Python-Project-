@@ -84,7 +84,7 @@ if df is not None:
     
     min_steps = int(df["daily_steps_count"].min()) if "daily_steps_count" in df.columns else 0
     max_steps = int(df["daily_steps_count"].max()) if "daily_steps_count" in df.columns else 20000
-    filter_steps = st.sidebar.slider("👟 4. Daily Steps Range:", min_steps, max_steps, (min_steps, max_steps))
+    filter_steps = st.sidebar.slider("WORKSPACE 4. Daily Steps Range:", min_steps, max_steps, (min_steps, max_steps))
     
     df_filtered = df.copy()
     
@@ -122,29 +122,29 @@ if df is not None:
                 st.markdown("#### User Distribution by Gender")
                 gender_counts = df_filtered["gender"].value_counts()
                 if not gender_counts.empty:
-                    fig, ax = plt.subplots(figsize=(8, 5))
+                    # Tăng nhẹ kích thước biểu đồ để nhãn không bị cắt lề ngoài
+                    fig, ax = plt.subplots(figsize=(7.5, 6))
                     
-                    # Tính toán tổng để tự tạo nhãn phần trăm chuẩn xác dưới Legend
                     total_gender = gender_counts.sum()
                     
-                    # SỬA TẠI ĐÂY: Loại bỏ autopct để vòng tròn không bị dính chữ lem nhem nữa
+                    # Tạo nhãn chứa cả tên nhóm, số lượng và số phần trăm (%) xuống dòng cho gọn
+                    labels = [f"{g}\n({n:,} - {n/total_gender*100:.1f}%)" for g, n in zip(gender_counts.index, gender_counts.values)]
+                    
+                    # SỬA TẠI ĐÂY: Loại bỏ hoàn toàn hộp Legend, đặt nhãn ra ngoài rìa miếng bánh
                     wedges, texts = ax.pie(
                         gender_counts.values,
+                        labels=labels,
+                        labeldistance=1.2,           # Đẩy nhãn văn bản ra phía ngoài vòng tròn
                         colors=plt.get_cmap("Pastel1").colors,
-                        startangle=90,
-                        wedgeprops=dict(width=0.4, edgecolor="white")
+                        startangle=150,              # Xoay góc tối ưu giúp miếng nhỏ phân bố đều sang góc trái, tránh đè chữ
+                        wedgeprops=dict(width=0.4, edgecolor="white") # Tạo khoảng trống donut rỗng giữa
                     )
+                    
+                    # Định cấu hình hiển thị font chữ cho rõ ràng
+                    for text in texts:
+                        text.set_fontsize(9.5)
+                        text.set_color("#2c3e50")
                         
-                    # SỬA TẠI ĐÂY: Tích hợp đầy đủ Số lượng + Phần trăm (%) xếp hàng ngay ngắn bên dưới
-                    ax.legend(
-                        wedges, 
-                        [f"{g}: {n:,} ({n/total_gender*100:.1f}%)" for g, n in zip(gender_counts.index, gender_counts.values)],
-                        title="Gender Groups",
-                        loc="upper center",
-                        bbox_to_anchor=(0.5, -0.05),
-                        ncol=2,
-                        frameon=False
-                    )
                     ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
@@ -155,27 +155,25 @@ if df is not None:
                 st.markdown("#### Proportion of Users with Children")
                 counts_child = df_filtered["has_children"].value_counts()
                 if not counts_child.empty:
-                    fig, ax = plt.subplots(figsize=(8, 5))
+                    fig, ax = plt.subplots(figsize=(7.5, 6))
                     
                     total_child = counts_child.sum()
+                    labels_child = [f"{k}\n({v:,} - {v/total_child*100:.1f}%)" for k, v in zip(counts_child.index, counts_child.values)]
                     
-                    # SỬA TẠI ĐÂY: Áp dụng đồng bộ giải pháp làm sạch cho cả biểu đồ trạng thái con cái
+                    # SỬA TẠI ĐÂY: Áp dụng quy chuẩn thiết kế nhãn ngoài rìa đồng bộ cho cả biểu đồ này
                     wedges, texts = ax.pie(
                         counts_child.values, 
+                        labels=labels_child,
+                        labeldistance=1.2,
                         colors=["#87C5FF", "#F8EBA3"], 
                         startangle=90,
                         wedgeprops=dict(width=0.4, edgecolor="white")
                     )
+                    
+                    for text in texts:
+                        text.set_fontsize(9.5)
+                        text.set_color("#2c3e50")
                         
-                    ax.legend(
-                        wedges,
-                        [f"{k}: {v:,} ({v/total_child*100:.1f}%)" for k, v in zip(counts_child.index, counts_child.values)],
-                        title="Parental Status",
-                        loc="upper center",
-                        bbox_to_anchor=(0.5, -0.05),
-                        ncol=2,
-                        frameon=False
-                    )
                     ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
