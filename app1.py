@@ -248,12 +248,10 @@ if df is not None:
                 st.markdown("#### Sleep Hours Per Night Distribution")
                 sleep_data = df_filtered["sleep_hours_per_night"].dropna()
                 if not sleep_data.empty:
-                    bins = np.arange(2, 11, 0.5)
-                    counts, edges = np.histogram(sleep_data, bins=bins)
-                    centers = (edges[:-1] + edges[1:]) / 2
                     fig, ax = plt.subplots(figsize=(8, 5))
-                    ax.plot(centers, counts, color="steelblue", linewidth=2.5)
+                    sns.kdeplot(sleep_data, color="steelblue", linewidth=2.5, fill=True, alpha=0.1, ax=ax)
                     ax.set_xlabel("Sleep Hours")
+                    ax.set_ylabel("Density")
                     st.pyplot(fig)
                     plt.close(fig)
                     st.caption("*A line chart showing the average nightly sleep hours of users, helping identify the most common sleep duration within the dataset population.*")
