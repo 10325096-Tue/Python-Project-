@@ -122,25 +122,20 @@ if df is not None:
                 st.markdown("#### User Distribution by Gender")
                 gender_counts = df_filtered["gender"].value_counts()
                 if not gender_counts.empty:
-                    # Tăng nhẹ kích thước biểu đồ để nhãn không bị cắt lề ngoài
                     fig, ax = plt.subplots(figsize=(7.5, 6))
                     
                     total_gender = gender_counts.sum()
-                    
-                    # Tạo nhãn chứa cả tên nhóm, số lượng và số phần trăm (%) xuống dòng cho gọn
                     labels = [f"{g}\n({n:,} - {n/total_gender*100:.1f}%)" for g, n in zip(gender_counts.index, gender_counts.values)]
                     
-                    # SỬA TẠI ĐÂY: Loại bỏ hoàn toàn hộp Legend, đặt nhãn ra ngoài rìa miếng bánh
                     wedges, texts = ax.pie(
                         gender_counts.values,
                         labels=labels,
-                        labeldistance=1.2,           # Đẩy nhãn văn bản ra phía ngoài vòng tròn
+                        labeldistance=1.2,
                         colors=plt.get_cmap("Pastel1").colors,
-                        startangle=150,              # Xoay góc tối ưu giúp miếng nhỏ phân bố đều sang góc trái, tránh đè chữ
-                        wedgeprops=dict(width=0.4, edgecolor="white") # Tạo khoảng trống donut rỗng giữa
+                        startangle=150,
+                        wedgeprops=dict(width=0.4, edgecolor="white")
                     )
                     
-                    # Định cấu hình hiển thị font chữ cho rõ ràng
                     for text in texts:
                         text.set_fontsize(9.5)
                         text.set_color("#2c3e50")
@@ -148,6 +143,7 @@ if df is not None:
                     ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Shows the structure and percentage distribution of users by gender, helping identify the majority target audience segments.*")
                 else:
                     st.info("No data available for Gender chart.")
 
@@ -160,7 +156,6 @@ if df is not None:
                     total_child = counts_child.sum()
                     labels_child = [f"{k}\n({v:,} - {v/total_child*100:.1f}%)" for k, v in zip(counts_child.index, counts_child.values)]
                     
-                    # SỬA TẠI ĐÂY: Áp dụng quy chuẩn thiết kế nhãn ngoài rìa đồng bộ cho cả biểu đồ này
                     wedges, texts = ax.pie(
                         counts_child.values, 
                         labels=labels_child,
@@ -177,6 +172,7 @@ if df is not None:
                     ax.axis('equal')  
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Illustrates the proportion of users with children compared to those without, supporting consumer behavior analysis based on family segments.*")
                 else:
                     st.info("No data available for Parental Status chart.")
 
@@ -192,6 +188,7 @@ if df is not None:
                 ax.set_ylabel("Number of Users")
                 st.pyplot(fig)
                 plt.close(fig)
+                st.caption("*A histogram displaying physical activity throught daily step counts, reflecting the overall health and fitness levels of the user community.*")
 
                 st.markdown("#### Distribution of Body Mass Index (BMI)")
                 bmi = df_filtered["body_mass_index"].dropna()
@@ -204,6 +201,7 @@ if df is not None:
                     ax.set_xlabel("BMI Value")
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Visualizes the density distribution of users' Body Mass Index (BMI), providing a quick assessment of general physical status (underweight, normal, obese).*")
 
             with col4:
                 st.markdown("#### Comparison of Systolic Blood Pressure by Gender")
@@ -217,6 +215,7 @@ if df is not None:
                     ax.legend()
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Compares the average systolic blood pressure across different genders against the standard safe threshold of 120 mmHg to highlight health trends.*")
                 else:
                     st.caption("Insufficient data to analyze blood pressure splits.")
 
@@ -239,6 +238,7 @@ if df is not None:
                                 color='#4a4a4a')
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Displays the user count breakdown across different daily nutrition and diet quality levels, ranging from very poor to excellent.*")
 
         with tab3:
             st.markdown("## Part 3: Lifestyle & Habits")
@@ -256,6 +256,7 @@ if df is not None:
                     ax.set_xlabel("Sleep Hours")
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*A line chart showing the average nightly sleep hours of users, helping identify the most common sleep duration within the dataset population.*")
 
                 st.markdown("#### Annual Travel Frequency Analysis")
                 df_travel = df_filtered["travel_frequency_per_year"].value_counts().sort_index()
@@ -266,6 +267,7 @@ if df is not None:
                     ax.set_xlabel("Trips per Year")
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Analyzes how often users travel annually, providing insights into mobility trends and tourism preferences across different audience groups.*")
 
             with col6:
                 st.markdown("#### Distribution of Books Read Per Year")
@@ -274,6 +276,7 @@ if df is not None:
                 ax.set_xlabel("Books Read")
                 st.pyplot(fig)
                 plt.close(fig)
+                st.caption("*Measures reading habits based on the total number of books read per year, indicating self-learning and leisure trends among users.*")
 
                 st.markdown("#### Distribution of Volunteer Hours")
                 v_hours = df_filtered["volunteer_hours_per_month"].dropna()
@@ -283,6 +286,7 @@ if df is not None:
                     ax.set_xlabel("Hours per Month")
                     st.pyplot(fig)
                     plt.close(fig)
+                    st.caption("*Represents the monthly hours spent on social volunteering activities, reflecting user engagement and contributions to the community.*")
 else:
     st.warning("Please check if 'data.csv' exists in your project folder.")
 
